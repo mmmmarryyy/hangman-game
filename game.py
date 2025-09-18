@@ -11,6 +11,7 @@ WORDS = [
     "УСЛОВИЕ", "СПИСОК", "СЛОВАРЬ", "МНОЖЕСТВО"
 ]
 
+
 stats = {
     "games_played": 0,
     "games_won": 0,
@@ -42,30 +43,40 @@ def main():
             print("Использованные буквы: " + ", ".join(sorted(guessed_letters)))
             
             # Ввод буквы
-            # TODO: обработать ввод буквы (используй get_user_guess)
-            
+
+            guess=get_user_guess(guessed_letters)
+            guessed_letters.add(guess)
+
             # Проверка угадана ли буква
-            # TODO: добавить реализацию проверки буквы (используй get_user_guess)
-            
+
+            if guess not in secret_word:
+                attempts_left -= 1
+                print(f"Буквы '{guess}' нет в слове")
+            else:
+                print(f"Буква '{guess}' в слове")
+
+
+
+
             input("\nНажмите Enter чтобы продолжить...")
             
             # Проверка условий окончания игры
             if check_win(secret_word, guessed_letters):
                 game_won = True
                 break
-        
         clear_console()
         if game_won:
             print("Поздравляем! Вы выиграли!")
             print(f"Загаданное слово: {secret_word}")
-            # score = TODO: получи с помощью функции счет (используй calculate_score)
-            # print(f"Ваш счет: {score}")
-            # TODO: обнови статистику (используй update_stats)
+            score = calculate_score(secret_word, MAX_ATTEMPTS - attempts_left)
+            print(f"Ваш счет: {score}")
+            update_stats(True, score)
         else:
             print("К сожалению, вы проиграли.")
             print(f"Загаданное слово: {secret_word}")
-            # TODO: обнови статистику (используй update_stats)
+            update_stats(False, 0)
             draw_gallows(0)
+
         
         show_stats()
         
@@ -83,52 +94,135 @@ def choose_random_word(word_list: List[str]) -> str:
 
 def get_masked_word(secret_word: str, guessed_letters: Set[str]) -> str:
     """Генерация замаскированного слова"""
-    # TODO: реализовать генерацию в зависимости от угаданных букв
+    masked_word=''
+    for letter in secret_word:
+        if letter in guessed_letters:
+            masked_word+=letter
+        else:
+            masked_word+='_'
+    return masked_word
 
 def draw_gallows(attempts_left: int):
     """Отрисовка виселицы в зависимости от количества оставшихся попыток"""
-    # TODO: реализовать отрисовку (нужно вызвать print)
-    # Подсказка:
-    # """
-        # --------
-        # |      |
-        # |      O
-        # |     \\|/
-        # |      |
-        # |     / \\
-        # -
-        # """
-    
+    status = [
+        """
+        --------
+        |      |
+        |      
+        |     
+        |      
+        |     
+        -
+        """,
+        """
+        --------
+        |      |
+        |      O
+        |     
+        |      
+        |     
+        -
+        """,
+        """
+        --------
+        |      |
+        |      O
+        |      |
+        |      |
+        |     
+        -
+        """,
+        """
+        --------
+        |      |
+        |      O
+        |     \\|
+        |      |
+        |     
+        -
+        """,
+        """
+        --------
+        |      |
+        |      O
+        |     \\|/
+        |      |
+        |     
+        -
+        """,
+        """
+        --------
+        |      |
+        |      O
+        |     \\|/
+        |      |
+        |     / 
+        -
+        """,
+        """
+        --------
+        |      |
+        |      O
+        |     \\|/
+        |      |
+        |     / \\
+        -
+        """
+    ]
+    print(status[MAX_ATTEMPTS - attempts_left])
 
 def get_user_guess(guessed_letters: Set[str]) -> str:
     """Ввод и валидация буквы от пользователя"""
-    # TODO: проверять, что пользователь ввел только одну букву, что он не вводил уже эту букву и тд
-    # Подсказка: не забывай про регистр
+    while True:
+        guess = input("Введите букву: ").upper()
+        if len(guess) != 1:
+            print("Введите одну букву!")
+            continue
+        if not guess.isalpha():
+            print("Пожалуйста, введите букву!")
+            continue
+        if guess in guessed_letters:
+            print("Эта буква уже проверялась, введите другую букву")
+            continue
+        return guess
 
 def check_win(secret_word: str, guessed_letters: Set[str]) -> bool:
     """Проверка, угадано ли все слово"""
-    # TODO: реализовать проверку
+    for letter in secret_word:
+        if letter not in guessed_letters:
+            return False
+    return True
 
 def calculate_score(secret_word: str, attempts_used: int) -> int:
     """Вычисление счета за игру"""
-    # TODO: необходимо, используя длину secret_word и количество попыток, посчитать счет
+
+    return len(secret_word)+attempts_used
+
 
 def update_stats(won: bool, score: int):
     """Обновление статистики в памяти"""
     global stats
-    # TODO: необходимо обновить stats
+    stats["games_played"] += 1
+    if won:
+        stats["games_won"] += 1
+        stats["total_score"] += score
+
+        if score > stats["best_score"]:
+            stats["best_score"] = score
 
 def show_stats():
     """Отображение статистики"""
     global stats
-    # win_percentage = TODO: посчитай на основе имеющейся статистики процент выигрыша
-    # average_score = TODO: посчитай на основе имеющейся статистики средний счет
+    win_percentage = stats["games_won"]/stats["games_played"]*100 if stats["games_played"] > 0 else 0
+    average_score =  stats["total_score"] / stats["games_won"] if stats["games_won"] > 0 else 0
     
     print("\n=== Статистика ===")
-    # print(f"Всего игр: {TODO: количество игр}")
-    # print(f"Побед: {TODO: количество побед} ({win_percentage:.1f}%)")
-    # print(f"Лучший счет: {TODO: выведи лучший счет}")
-    # TODO: выведи средний счет, если была хотя бы одна победа
+    print(f"Всего игр:  {stats['games_played']}")
+    print(f"Побед: {stats['games_won']} ({win_percentage:.1f}%)")
+    print(f"Лучший счет: {stats['best_score']}")
+    if stats['games_won']!=0:
+        print(f"Средний счет:{average_score}")
+
 
 if __name__ == "__main__":
     main()
