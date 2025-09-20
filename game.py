@@ -214,7 +214,7 @@ def show_stats():
     print(f"Побед: {stats['games_won']} ({win_percentage:.1f}%)")
     print(f"Лучший счет: {stats["best_score"]}")
     if stats["games_won"] > 0:
-        print(average_score)
+        print(f"Средний счет: {average_score}")
 
 if __name__ == "__main__":
     main()
