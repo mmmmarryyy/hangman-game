@@ -196,7 +196,7 @@ def check_win(secret_word: str, guessed_letters: Set[str]) -> bool:
 def calculate_score(secret_word: str, attempts_used: int) -> int:
     """Вычисление счета за игру"""
 
-    return len(secret_word)+attempts_used
+    return len(secret_word)+MAX_ATTEMPTS-attempts_used
 
 
 def update_stats(won: bool, score: int):
