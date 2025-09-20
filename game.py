@@ -99,18 +99,73 @@ def get_masked_word(secret_word: str, guessed_letters: Set[str]) -> str:
 
 def draw_gallows(attempts_left: int):
     """Отрисовка виселицы в зависимости от количества оставшихся попыток"""
-    print(f"gallows: {attempts_left}")
-    # TODO: реализовать отрисовку (нужно вызвать print)
-    # Подсказка:
-    # """
-        # --------
-        # |      |
-        # |      O
-        # |     \\|/
-        # |      |
-        # |     / \\
-        # -
-        # """
+    stages = [
+        """
+           --------
+           |      |
+           |      O
+           |     \\|/
+           |      |
+           |     / \\
+           -
+        """,
+        """
+           --------
+           |      |
+           |      O
+           |     \\|/
+           |      |
+           |     / 
+           -
+        """,
+        """
+           --------
+           |      |
+           |      O
+           |     \\|/
+           |      |
+           |      
+           -
+        """,
+        """
+           --------
+           |      |
+           |      O
+           |      |
+           |      |
+           |      
+           -
+        """,
+        """
+           --------
+           |      |
+           |      O
+           |      
+           |      
+           |      
+           -
+        """,
+        """
+           --------
+           |      |
+           |      
+           |      
+           |      
+           |      
+           -
+        """,
+        """
+           --------
+           |      
+           |      
+           |      
+           |      
+           |      
+           -
+        """
+    ]
+    
+    print(stages[min(attempts_left, 5)])
     
 
 def get_user_guess(guessed_letters: Set[str]) -> str:
@@ -137,7 +192,7 @@ def check_win(secret_word: str, guessed_letters: Set[str]) -> bool:
 def calculate_score(secret_word: str, attempts_used: int) -> int:
     """Вычисление счета за игру"""
     if (attempts_used != MAX_ATTEMPTS):
-        return (len(secret_word) - attempts_used)
+        return (len(secret_word)*2 - attempts_used)
     else:
         return 0
 def update_stats(won: bool, score: int):
