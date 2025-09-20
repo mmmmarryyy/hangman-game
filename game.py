@@ -2,7 +2,10 @@ import random
 import os
 from typing import List, Set
 
+
 # Константы и данные
+RUSSIAN_LETTERS = set('абвгдежзийклмнопрстуфхцчшщъыьэюя'
+                       'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ')
 MAX_ATTEMPTS = 6
 WORDS = [
     "ПРОГРАММИРОВАНИЕ", "АЛГОРИТМ", "КОМПЬЮТЕР", "ВИСЕЛИЦА", 
@@ -16,6 +19,7 @@ stats = {
     "games_won": 0,
     "total_score": 0,
     "best_score": 0
+    
 }
 
 def main():
@@ -41,30 +45,31 @@ def main():
             print("\nСлово: " + get_masked_word(secret_word, guessed_letters))
             print("Использованные буквы: " + ", ".join(sorted(guessed_letters)))
             
-            # Ввод буквы
-            # TODO: обработать ввод буквы (используй get_user_guess)
-            
-            # Проверка угадана ли буква
-            # TODO: добавить реализацию проверки буквы (используй get_user_guess)
-            
+            new_letter = get_user_guess(guessed_letters)
+            if new_letter in secret_word:
+                print(f"В слове есть буква \"{new_letter}\"!")
+            else:
+                print(f"В слове нет буквы \"{new_letter}\"")
+                attempts_left -= 1
+
+            guessed_letters.add(new_letter)
             input("\nНажмите Enter чтобы продолжить...")
             
             # Проверка условий окончания игры
             if check_win(secret_word, guessed_letters):
                 game_won = True
                 break
-        
         clear_console()
+        score = calculate_score(secret_word, MAX_ATTEMPTS-attempts_left)
         if game_won:
             print("Поздравляем! Вы выиграли!")
             print(f"Загаданное слово: {secret_word}")
-            # score = TODO: получи с помощью функции счет (используй calculate_score)
-            # print(f"Ваш счет: {score}")
-            # TODO: обнови статистику (используй update_stats)
+            print(f"Ваш счет: {score}")
+            update_stats(True, score)
         else:
             print("К сожалению, вы проиграли.")
             print(f"Загаданное слово: {secret_word}")
-            # TODO: обнови статистику (используй update_stats)
+            update_stats(False, score)
             draw_gallows(0)
         
         show_stats()
@@ -83,10 +88,18 @@ def choose_random_word(word_list: List[str]) -> str:
 
 def get_masked_word(secret_word: str, guessed_letters: Set[str]) -> str:
     """Генерация замаскированного слова"""
-    # TODO: реализовать генерацию в зависимости от угаданных букв
+    mask = ""
+    for letter in secret_word:
+        if letter in guessed_letters:
+            mask += letter
+        else:
+            mask += "_"
+        mask += " "
+    return mask
 
 def draw_gallows(attempts_left: int):
     """Отрисовка виселицы в зависимости от количества оставшихся попыток"""
+    print(f"gallows: {attempts_left}")
     # TODO: реализовать отрисовку (нужно вызвать print)
     # Подсказка:
     # """
@@ -102,33 +115,51 @@ def draw_gallows(attempts_left: int):
 
 def get_user_guess(guessed_letters: Set[str]) -> str:
     """Ввод и валидация буквы от пользователя"""
-    # TODO: проверять, что пользователь ввел только одну букву, что он не вводил уже эту букву и тд
-    # Подсказка: не забывай про регистр
+    
+    print("Попробуйте угадать букву из загаданного слова")
+    while(True):
+        users_input = input().upper()
+        if len(users_input) != 1:
+            print("Пожалуйста введите только одну букву")
+        elif users_input[0] not in RUSSIAN_LETTERS:
+            print("Неизвестный символ, введите букву из русского алфавита")
+        elif users_input[0] in guessed_letters:
+            print("Вы уже пробовали эту букву, введите другую")
+        else:
+            break
+    return users_input[0]
 
 def check_win(secret_word: str, guessed_letters: Set[str]) -> bool:
-    """Проверка, угадано ли все слово"""
-    # TODO: реализовать проверку
+    if all(letter in guessed_letters for letter in secret_word):
+        return 1
+    return 0
 
 def calculate_score(secret_word: str, attempts_used: int) -> int:
     """Вычисление счета за игру"""
-    # TODO: необходимо, используя длину secret_word и количество попыток, посчитать счет
-
+    if (attempts_used != MAX_ATTEMPTS):
+        return (len(secret_word) - attempts_used)
+    else:
+        return 0
 def update_stats(won: bool, score: int):
     """Обновление статистики в памяти"""
     global stats
-    # TODO: необходимо обновить stats
+    stats["games_played"] += 1
+    stats["games_won"] += won
+    stats["total_score"] += score
+    stats["best_score"] = max(stats["best_score"], score)
 
 def show_stats():
     """Отображение статистики"""
     global stats
-    # win_percentage = TODO: посчитай на основе имеющейся статистики процент выигрыша
-    # average_score = TODO: посчитай на основе имеющейся статистики средний счет
+    win_percentage = 100 * stats["games_won"] / stats["games_played"]
+    average_score = stats["total_score"] / stats["games_played"]
     
     print("\n=== Статистика ===")
-    # print(f"Всего игр: {TODO: количество игр}")
-    # print(f"Побед: {TODO: количество побед} ({win_percentage:.1f}%)")
-    # print(f"Лучший счет: {TODO: выведи лучший счет}")
-    # TODO: выведи средний счет, если была хотя бы одна победа
+    print(f"Всего игр: {stats['games_played']}")
+    print(f"Побед: {stats['games_won']} ({win_percentage:.1f}%)")
+    print(f"Лучший счет: {stats["best_score"]}")
+    if stats["games_won"] > 0:
+        print(average_score)
 
 if __name__ == "__main__":
     main()
