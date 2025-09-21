@@ -50,9 +50,12 @@ def main():
             guessed_letters.add(guess)
 
             # Проверка угадана ли буква
-            if guess not in secret_word:
+            if guess in secret_word:
+                print(f"Угадана буква {guess}")
+            else:             
                 attempts_left -= 1
-            
+                print(f"Нет буквы {guess}")
+
             input("\nНажмите Enter чтобы продолжить...")
             
             # Проверка условий окончания игры
