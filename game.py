@@ -2,6 +2,8 @@ import random
 import os
 from typing import List, Set
 
+
+WORDS = []
 # Константы и данные
 MAX_ATTEMPTS = 6
 WORDS = [
@@ -191,35 +193,31 @@ def draw_gallows(attempts_left: int):
         )
 
 
-def get_user_guess(secret_word: str, guessed_letters: Set[str]) -> str:
+def get_user_guess(secret_word: str, guessed_letters: Set[str]) -> bool:
     """Ввод и валидация буквы от пользователя"""
-    print("Введите букву")
-    letter = str(input()).upper()
-    if letter in guessed_letters:
-        print("Вы уже вводили эту букву, попробуйте ещё раз.")
-        get_user_guess(secret_word, guessed_letters)
-    elif len(letter) > 1:
-        print("Вы ввели больше одного символа, попробуйте ещё раз.")
-        get_user_guess(secret_word, guessed_letters)
-    elif not letter.isalpha():
-        print("Вы ввели не букву, попробуйте ещё раз.")
-        get_user_guess(secret_word, guessed_letters)
-    else:
-        if letter in secret_word:
-            print("Вы угадали букву")
-            guessed_letters.add(letter)
-            return True
+    while True:
+        print("Введите букву")
+        letter = str(input()).upper()
+        if letter in guessed_letters:
+            print("Вы уже вводили эту букву, попробуйте ещё раз.")
+        elif len(letter) > 1:
+            print("Вы ввели больше одного символа, попробуйте ещё раз.")
+        elif not letter.isalpha():
+            print("Вы ввели не букву, попробуйте ещё раз.")
         else:
-            print("К сожалению, вы ошиблись.")
-            guessed_letters.add(letter)
-            return False
+            if letter in secret_word:
+                print("Вы угадали букву")
+                guessed_letters.add(letter)
+                return True
+            else:
+                print("К сожалению, вы ошиблись.")
+                guessed_letters.add(letter)
+                return False
 
 
 def check_win(secret_word: str, guessed_letters: Set[str]) -> bool:
     """Проверка, угадано ли все слово"""
-    if all(el in guessed_letters for el in secret_word):
-        return True
-    return False
+    return all(el in guessed_letters for el in secret_word)
 
 
 def calculate_score(secret_word: str, attempts_left: int) -> int:
