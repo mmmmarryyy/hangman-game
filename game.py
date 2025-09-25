@@ -2,8 +2,6 @@ import random
 import os
 from typing import List, Set
 
-
-WORDS = []
 # Константы и данные
 MAX_ATTEMPTS = 6
 WORDS = [
