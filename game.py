@@ -2,8 +2,8 @@ import random
 import os
 from typing import List, Set
 
-# Список слов из файла Words.txt
-WORDS = open("Words.txt").readline().split()
+# Список слов
+WORDS = []
 
 # Константы и данные
 MAX_ATTEMPTS = 6
@@ -96,50 +96,65 @@ def get_masked_word(secret_word: str, guessed_letters: Set[str]) -> str:
 
 def draw_gallows(attempts_left: int):
     """Отрисовка виселицы в зависимости от количества оставшихся попыток"""
-    print("--------")
-    print("|      |")
-    if attempts_left == 6: 
-        print("|       ")
-        print("|       ")
-        print("|       ")
-        print("|       ")
-        print("-       ")
-    if attempts_left == 5: 
-        print("|      O ")
-        print("|       ")
-        print("|       ")
-        print("|       ")
-        print("-       ")
-    if attempts_left == 4: 
-        print("|      O ")
-        print("|      | ")
-        print("|      | ")
-        print("|       ")
-        print("-       ")
-    if attempts_left == 3: 
-        print("|      O ")
-        print("|     \| ")
-        print("|      | ")
-        print("|       ")
-        print("-       ")
-    if attempts_left == 2: 
-        print("|      O ")
-        print("|     \|/")
-        print("|      | ")
-        print("|       ")
-        print("-       ")
-    if attempts_left == 1: 
-        print("|      O ")
-        print("|     \|/")
-        print("|      | ")
-        print("|     /  ")
-        print("-       ")
-    if attempts_left == 0: 
-        print("|      O ")
-        print("|     \|/")
-        print("|      | ")
-        print("|     / \\")
-        print("-       ")
+    stages = {
+        6: """
+--------
+|      |
+|       
+|       
+|       
+|       
+-       """,
+        5: """
+--------
+|      |
+|      O
+|       
+|       
+|       
+-       """,
+        4: """
+--------
+|      |
+|      O
+|      |
+|      |
+|       
+-       """,
+        3: """
+--------
+|      |
+|      O
+|     \|
+|      |
+|       
+-       """,
+        2: """
+--------
+|      |
+|      O
+|     \|/
+|      |
+|       
+-       """,
+        1: """
+--------
+|      |
+|      O
+|     \|/
+|      |
+|     / 
+-       """,
+        0: """
+--------
+|      |
+|      O
+|     \|/
+|      |
+|     / \\
+-       """,
+    }
+    print(stages[attempts_left])
     
 def get_user_guess(guessed_letters: Set[str]) -> str:
     """Ввод и валидация буквы от пользователя"""
@@ -147,7 +162,7 @@ def get_user_guess(guessed_letters: Set[str]) -> str:
     flag = False
     while flag == False:
         guess_letter = input().upper()
-        if guess_letter.isalpha() == True and len(guess_letter) == 1 and guess_letter not in guessed_letters:
+        if guess_letter.isalpha() and len(guess_letter) == 1 and guess_letter not in guessed_letters:
             flag = True
         else: print("Ошибка ввода! Повторите ввод.")
     return guess_letter
@@ -157,8 +172,10 @@ def check_win(secret_word: str, guessed_letters: Set[str]) -> bool:
     cnt = 0
     for i in guessed_letters:
         if i in secret_word: cnt += secret_word.count(i)
-    if cnt == len(secret_word): return True
-    else: return False
+    if cnt == len(secret_word): 
+        return True
+    else: 
+        return False
 
 def calculate_score(secret_word: str, attempts_used: int) -> int:
     """Вычисление счета за игру"""
@@ -184,5 +201,11 @@ def show_stats():
     print(f"Лучший счет: {stats['best_score']}")
     if stats["games_won"] > 0: print(f"Ваш средний счёт за игру: {average_score}")
 
+def read_words(WORDS):
+    with open("Words.txt", "r", encoding="utf-8") as f:
+        for line in f:
+            WORDS.append(line.strip())
+
 if __name__ == "__main__":
+    read_words(WORDS)
     main()
